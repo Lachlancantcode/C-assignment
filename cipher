@@ -1,0 +1,172 @@
+/* This program encrypts and decrypts two common types of ciphers (rotation and substitution), given a known rotation
+or key (depending on cipher type). For the rotation cipher it simply uses math alongside an ascii table with the known
+key to find the correct characters given via the string tbe. The substitution cipher also utilizes math and an ascii 
+table to find which letter on the keystring, labelled str, corresponds to the input.
+*/
+
+/* Regarding UI, all inputs are appropriately described to allow easy input with limited confusion. The program then 
+utilize a basic switch function when the inputs are done correctly.
+*/
+#include <stdio.h>
+
+
+
+int main()	{
+	char tbe[100], ch, str[26];	//set two strings: allowing the message(tbe) to be 100 characters, and the alphabetic key(str(being creative is hard)) to be 26 characters 
+	int cipher, ed, key, i, v, e, x, y;	//used for multiple choice UI and attempting to de_math :P
+	
+	printf("\nWelcome to cipher program"); //gotta be friendly 
+	
+	printf("\nEnter a message to encrypt/decrypt: "); //people need to know what to input
+	gets(tbe); //it puts what was entered into tbe :o, allows it to be used later
+	
+	printf("\nEnter 26 letter keystring if using substituion: "); //gets() was being painful so i had to input it this way rather than using if(cipher = 3);
+		gets(str); //heres your new alphabet for encryption/decryption
+	
+	printf("\nEnter key if rotation, 0 if substitution: "); //give me your key for rotation or ill be sad
+	scanf("%d", &key); //saves key to key, makes it easy to understand. The key is used later to rotate the alphabet
+	
+	printf("\nRotation is 1, substitution is 3: "); //any number can be input cause i ran out of time to fix, hopefully user can read options
+	scanf("%d", &cipher); //save answer to be used in later function
+	
+	printf("\nEncryption is 1, decryption is 2: "); //tells them what to type
+	scanf("%d", &ed); //saves their answer :)
+	
+	char wrd[26] = "abcdefghijklmnopqrstuvwxyz %s"; //string of the alphabet for case 5 (i shudder when i think of the case 5)
+	
+	cipher = cipher + ed; //adds two above answers to find out what you want to do (cipher == 2,3,4,5)
+    /* The switch is pretty simple, it uses basic addition from the answers given regarding what type of cipher and 
+    whether user wants to encrypt or decrypt using the above equation (cipher = cipher + ed). When switch is done it 
+    prints its answer and returns 0, aka lights out. I did implement a default for the switch in case the above 
+    options were answered outside of paremeters, accidentally or otherwise (looking at you Gary).
+    */
+	switch(cipher)	{ //switches to correct action
+/* Case 2: Encrypts using rotation cipher, breaks loop when out of user inputs, using key input previously and the tbe string.	
+*/
+		case 2:
+				for(i = 0; tbe[i] != '\0'; ++i){ //if something is written, start working
+					ch = tbe[i]; // kept getting errors when using tbe[i]
+		
+					if(ch >= 'a' && ch <= 'z'){ //if a lower case letter (ignores spaces and numbers etc)
+						ch = ch + key; // rotates to correct letter while ignoring everything else including spaces
+			
+						if(ch > 'z'){ // if it rotates out of alphabet above z
+							ch = ch - 'z' + 'a' - 1; // go to a (rotation maintained)
+						}
+						if(ch < 'a'){ // if it rotates below a
+							ch = ch - 'a' + 'z' - 1; //go to z (rotation maintained)
+						}
+			
+						tbe[i] = ch; //each letter gets placed back in where it was (spaces included)
+					}
+					
+					else if(ch >= 'A' && ch <= 'Z'){ //if an upper case letter (ignores spaces and numbers etc)
+						ch = ch + key; //rotates to correct letter
+			
+						if(ch > 'Z'){ //same is before, if rotated out of upper case alphabet it'll fix itself
+							ch = ch - 'Z' + 'A' - 1; //finally understand what algebra is for
+						}
+						if(ch < 'A'){ //if below upper case A
+							ch = ch - 'A' + 'Z' - 1; //rotates back into alphabet
+						}
+			
+						tbe[i] = ch; // each letter placed back into string after rotations are comple to be printed
+					}
+	
+				}
+	printf("Encrypted message: %s", tbe); //prints encrypted message, mission accomplished, lets go home
+					
+	break; //leaves switch
+
+
+	
+/* Case 3: Decrypts using rotation cipher, breaks loop when out of user inputs, using key input previously and the tbe string.	
+*/
+		case 3:	
+				for(i = 0; tbe[i] != '\0'; ++i)	{ //if something is written, start working
+					ch = tbe[i]; //after previous errors this is my default
+		
+					if(ch >= 'A' && ch <= 'Z'){ //if in upper case alphabet
+						ch = ch - key; //rotate in reverse
+			
+						if(ch < 'A'){ //if rotated below A 
+							ch = ch + 'Z' - 'A' + 1; //rotate back into other end of alphabet
+						}
+						if(ch > 'Z'){ //if rotated above Z
+							ch = ch + 'A' - 'Z' + 1; //rotate back into other end of alphabet
+						}
+
+			
+					tbe[i] = ch; //each letter placed back into string
+					}
+					else if(ch >= 'a' && ch <= 'z'){ //if in lower case alphabet
+						ch = ch - key; //rotate in reverse
+			
+						if(ch < 'a'){ //if rotated below a
+							ch = ch + 'z' - 'a' + 1; //rotate back to other end of alphabet
+						}
+						if(ch > 'z'){ //if rotated above z
+							ch = ch + 'a' - 'z' + 1; //rotate back to other end of alphabet
+						}
+			
+						tbe[i] = ch; //each letter placed back into string
+					}
+				}
+	
+				printf("Decrypted message: %s", tbe); //print string
+		break; //leave switch function
+
+/* Case 4: Encrypts using substitution cipher, breaks loop when out of user inputs, using the keystring str input previously and the tbe string.	
+*/
+		case 4: 
+				for(i = 0; tbe[i] != '\0'; ++i)	{ //if something written
+					ch = tbe[i]; //it works
+					if(ch != '\0')	{ //if not null
+						if(ch >= 'a' && ch <= 'z')	{ //if lower case letter
+							v = ch - 97; //make ascii number between 0 and 25 
+							ch = str[v]; //make above number a letter in keystring
+						}	
+						else if(ch >= 'A' && ch <= 'Z')	{ //if upper case letter
+							v = ch - 65; //make ascii number between 0 and 25
+							ch = str[v]; //make that number a letter in keystring
+						}	
+					}
+					
+					tbe[i] = ch; //each letter placed back into string
+				}
+			printf("Decrypted message: %s", tbe); //print string
+				
+				
+		break; //leave switch
+/* Case 5:i dont know how to get this to work (spent way too long and have run out of time)
+case 5 does not work
+*/
+		case 5: 
+				for(i = 0; tbe[i] != '\0'; ++i)	{
+					ch = tbe[i];
+					if(ch != '\0')	{
+						if(ch >= 'a' && ch <= 'z')	{
+							v = ch - 97;
+							y = wrd[v];
+							ch =  y;
+						   
+						   
+							
+						}
+						else if(ch >= 'A' && ch <= 'Z')	{
+							ch = ch - 65;
+							
+						}	
+					}
+					
+					tbe[i] = ch;
+				}
+			printf("Decrypted message: %s", tbe);
+		break;
+
+		default: printf("Please restart program and select availiable options"); //if input does not equal option
+		break; //leave switch
+	}
+	printf("\nProgram Terminating..."); //showing program end
+	return 0; //end program
+}
